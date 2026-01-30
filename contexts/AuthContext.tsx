@@ -36,20 +36,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Sign up new user
   async function signup(email: string, password: string, name: string) {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    try {
+      console.log('AuthContext: Starting signup for:', email);
 
-    // Update display name
-    await updateProfile(user, { displayName: name });
+      // Check if Firebase is initialized
+      if (!auth || typeof auth.createUser === 'undefined') {
+        console.error('AuthContext: Firebase auth not properly initialized');
+        throw new Error('Authentication service not available');
+      }
 
-    // Create user document in Firestore
-    await setDoc(doc(db, 'users', user.uid), {
-      email: user.email,
-      name: name,
-      role: 'participant', // Default role
-      createdAt: new Date().toISOString(),
-      avatar: null,
-    });
+      console.log('AuthContext: Creating user with Firebase Auth...');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('AuthContext: User created in Firebase Auth:', user.uid);
+
+      // Update display name
+      console.log('AuthContext: Updating display name...');
+      await updateProfile(user, { displayName: name });
+      console.log('AuthContext: Display name updated');
+
+      // Create user document in Firestore with timeout
+      console.log('AuthContext: Creating Firestore user document...');
+      await Promise.race([
+        setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          name: name,
+          role: 'participant', // Default role
+          createdAt: new Date().toISOString(),
+          avatar: null,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firestore write timeout after 5 seconds')), 5000)
+        )
+      ]);
+      console.log('AuthContext: Firestore user document created');
+      console.log('AuthContext: Signup complete!');
+    } catch (error) {
+      console.error('AuthContext: Signup error:', error);
+      throw error;
+    }
   }
 
   // Login existing user
