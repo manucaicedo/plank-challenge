@@ -68,11 +68,14 @@ export default function LeaderboardPage() {
       const participantsRef = collection(db, 'participants');
       const participantsQuery = query(
         participantsRef,
-        where('userId', '==', user?.uid),
-        where('status', '==', 'active')
+        where('userId', '==', user?.uid)
       );
       const participantsSnapshot = await getDocs(participantsQuery);
-      const challengeIds = participantsSnapshot.docs.map((doc) => doc.data().challengeId);
+
+      // Filter by status to avoid compound index requirement
+      const challengeIds = participantsSnapshot.docs
+        .filter((doc) => doc.data().status === 'active')
+        .map((doc) => doc.data().challengeId);
 
       if (challengeIds.length === 0) {
         setLoading(false);

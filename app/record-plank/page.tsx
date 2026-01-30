@@ -52,12 +52,14 @@ export default function RecordPlankPage() {
       const participantsRef = collection(db, 'participants');
       const q = query(
         participantsRef,
-        where('userId', '==', user?.uid),
-        where('status', '==', 'active')
+        where('userId', '==', user?.uid)
       );
       const snapshot = await getDocs(q);
 
-      const challengeIds = snapshot.docs.map((doc) => doc.data().challengeId);
+      // Filter by status to avoid compound index requirement
+      const challengeIds = snapshot.docs
+        .filter((doc) => doc.data().status === 'active')
+        .map((doc) => doc.data().challengeId);
 
       if (challengeIds.length === 0) {
         setLoading(false);

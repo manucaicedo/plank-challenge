@@ -64,12 +64,11 @@ export default function DashboardPage() {
       }
 
       console.log('Dashboard: Fetching participants for user:', user?.uid);
-      // Fetch user's challenges with timeout
+      // Fetch user's challenges - use simple query to avoid index issues
       const participantsRef = collection(db, 'participants');
       const participantsQuery = query(
         participantsRef,
-        where('userId', '==', user?.uid),
-        where('status', '==', 'active')
+        where('userId', '==', user?.uid)
       );
 
       console.log('Dashboard: Executing Firestore query...');
@@ -79,7 +78,11 @@ export default function DashboardPage() {
           setTimeout(() => reject(new Error('Firestore query timeout after 3 seconds')), 3000)
         )
       ]);
-      const challengeIds = participantsSnapshot.docs.map((doc) => doc.data().challengeId);
+
+      // Filter by status in JavaScript to avoid compound index requirement
+      const challengeIds = participantsSnapshot.docs
+        .filter((doc) => doc.data().status === 'active')
+        .map((doc) => doc.data().challengeId);
 
       console.log('Dashboard: Found challenge IDs:', challengeIds);
       console.log('Dashboard: Number of participants found:', participantsSnapshot.docs.length);
