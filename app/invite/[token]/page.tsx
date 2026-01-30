@@ -28,7 +28,7 @@ export default function InvitationPage() {
   const params = useParams();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const token = params.token as string;
+  const token = params?.token as string;
 
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [challenge, setChallenge] = useState<Challenge | null>(null);

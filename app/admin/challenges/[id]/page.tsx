@@ -31,7 +31,7 @@ interface Participant {
 export default function ChallengeDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const challengeId = params.id as string;
+  const challengeId = params?.id as string;
 
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
