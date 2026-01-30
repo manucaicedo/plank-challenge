@@ -121,14 +121,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      console.log('AuthContext: Setting up auth state listener');
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        console.log('AuthContext: Auth state changed, user:', user ? user.email : 'null');
         clearTimeout(timeout);
         setUser(user);
         if (user) {
+          console.log('AuthContext: Fetching role for user:', user.uid);
           await fetchUserRole(user.uid, user.email);
         } else {
           setUserRole(null);
         }
+        console.log('AuthContext: Setting loading to false');
         setLoading(false);
       });
 
