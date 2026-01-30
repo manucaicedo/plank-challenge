@@ -64,20 +64,28 @@ export default function DashboardPage() {
       }
 
       console.log('Dashboard: Fetching participants for user:', user?.uid);
-      // Fetch user's challenges
+      // Fetch user's challenges with timeout
       const participantsRef = collection(db, 'participants');
       const participantsQuery = query(
         participantsRef,
         where('userId', '==', user?.uid),
         where('status', '==', 'active')
       );
-      const participantsSnapshot = await getDocs(participantsQuery);
+
+      console.log('Dashboard: Executing Firestore query...');
+      const participantsSnapshot = await Promise.race([
+        getDocs(participantsQuery),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Firestore query timeout after 3 seconds')), 3000)
+        )
+      ]);
       const challengeIds = participantsSnapshot.docs.map((doc) => doc.data().challengeId);
 
       console.log('Dashboard: Found challenge IDs:', challengeIds);
+      console.log('Dashboard: Number of participants found:', participantsSnapshot.docs.length);
 
       if (challengeIds.length === 0) {
-        console.log('Dashboard: No challenges found');
+        console.log('Dashboard: No challenges found - user is not a participant in any active challenges');
         setLoading(false);
         return;
       }
