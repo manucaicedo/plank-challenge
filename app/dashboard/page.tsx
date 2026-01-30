@@ -39,19 +39,31 @@ export default function DashboardPage() {
     if (!authLoading && !user) {
       router.push('/login');
     } else if (user) {
-      fetchUserData();
+      // Set a timeout to stop loading after 5 seconds
+      const timeout = setTimeout(() => {
+        console.warn('Dashboard loading timeout - stopping loading state');
+        setLoading(false);
+      }, 5000);
+
+      fetchUserData().finally(() => {
+        clearTimeout(timeout);
+      });
+
+      return () => clearTimeout(timeout);
     }
   }, [user, authLoading, router]);
 
   async function fetchUserData() {
+    console.log('Dashboard: Starting fetchUserData');
     try {
       // Check if db is initialized
       if (!db || Object.keys(db).length === 0) {
-        console.error('Firestore not initialized');
+        console.error('Dashboard: Firestore not initialized');
         setLoading(false);
         return;
       }
 
+      console.log('Dashboard: Fetching participants for user:', user?.uid);
       // Fetch user's challenges
       const participantsRef = collection(db, 'participants');
       const participantsQuery = query(
@@ -62,7 +74,10 @@ export default function DashboardPage() {
       const participantsSnapshot = await getDocs(participantsQuery);
       const challengeIds = participantsSnapshot.docs.map((doc) => doc.data().challengeId);
 
+      console.log('Dashboard: Found challenge IDs:', challengeIds);
+
       if (challengeIds.length === 0) {
+        console.log('Dashboard: No challenges found');
         setLoading(false);
         return;
       }
@@ -83,15 +98,18 @@ export default function DashboardPage() {
         (c) => c !== null
       ) as Challenge[];
 
+      console.log('Dashboard: Fetched challenges:', challengeData);
       setChallenges(challengeData);
 
       // Select first challenge by default
       if (challengeData.length > 0) {
+        console.log('Dashboard: Fetching planks for first challenge');
         setSelectedChallengeId(challengeData[0].id);
         await fetchPlanksForChallenge(challengeData[0].id, challengeData[0]);
+        console.log('Dashboard: Finished fetching planks');
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Dashboard: Error fetching user data:', error);
     } finally {
       setLoading(false);
     }
