@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, addDoc } from 'firebase/firestore';
 import { calculatePlankStats, formatDuration, calculateImprovement } from '@/lib/utils/plankStats';
+import { getLocalDateString } from '@/lib/utils/dateUtils';
 
 interface Challenge {
   id: string;
@@ -212,7 +213,7 @@ export default function LeaderboardPage() {
 
     try {
       setGivingFistbump(toUserId);
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateString();
 
       // Check if already gave fistbump today
       const fistbumpsRef = collection(db, 'fistbumps');

@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { getLocalDateString } from '@/lib/utils/dateUtils';
 
 interface Challenge {
   id: string;
@@ -101,7 +102,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-4">
                   {challenges.map((challenge) => {
-                    const today = new Date().toISOString().split('T')[0];
+                    const today = getLocalDateString();
                     const isActive = challenge.startDate <= today && challenge.endDate >= today;
                     const isUpcoming = challenge.startDate > today;
                     const isCompleted = challenge.endDate < today;

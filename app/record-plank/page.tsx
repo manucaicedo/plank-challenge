@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import PlankTimer from '@/components/PlankTimer';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { getLocalDateString } from '@/lib/utils/dateUtils';
 
 interface Challenge {
   id: string;
@@ -82,7 +83,7 @@ export default function RecordPlankPage() {
       ) as Challenge[];
 
       // Filter for active challenges (today is between start and end date)
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateString();
       const activeChallenges = challengeData.filter(
         (c) => c.startDate <= today && c.endDate >= today
       );
@@ -101,7 +102,11 @@ export default function RecordPlankPage() {
 
   async function checkAlreadyRecorded(challengeId: string) {
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateString();
+      console.log('Checking if already recorded for date:', today);
+      console.log('User ID:', user?.uid);
+      console.log('Challenge ID:', challengeId);
+
       const planksRef = collection(db, 'planks');
       const q = query(
         planksRef,
@@ -110,6 +115,13 @@ export default function RecordPlankPage() {
         where('date', '==', today)
       );
       const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        console.log('Found existing plank record:', snapshot.docs[0].data());
+      } else {
+        console.log('No existing plank found for today - you can record!');
+      }
+
       return !snapshot.empty;
     } catch (error) {
       console.error('Error checking plank:', error);
@@ -142,7 +154,7 @@ export default function RecordPlankPage() {
       setSaving(true);
       setError('');
 
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateString();
 
       await addDoc(collection(db, 'planks'), {
         userId: user?.uid,
