@@ -39,6 +39,14 @@ export default function RecordPlankPage() {
 
   async function fetchUserChallenges() {
     try {
+      // Check if db is initialized
+      if (!db || Object.keys(db).length === 0) {
+        console.error('Firestore not initialized');
+        setError('Database not initialized. Please refresh the page.');
+        setLoading(false);
+        return;
+      }
+
       // Get challenges where user is a participant
       const participantsRef = collection(db, 'participants');
       const q = query(

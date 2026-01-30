@@ -48,6 +48,13 @@ export default function ChallengeDetailPage() {
 
   async function fetchChallenge() {
     try {
+      // Check if db is initialized
+      if (!db || Object.keys(db).length === 0) {
+        console.error('Firestore not initialized');
+        setLoading(false);
+        return;
+      }
+
       const challengeDoc = await getDoc(doc(db, 'challenges', challengeId));
       if (challengeDoc.exists()) {
         setChallenge({
@@ -64,6 +71,12 @@ export default function ChallengeDetailPage() {
 
   async function fetchParticipants() {
     try {
+      // Check if db is initialized
+      if (!db || Object.keys(db).length === 0) {
+        console.error('Firestore not initialized');
+        return;
+      }
+
       const participantsRef = collection(db, 'participants');
       const q = query(participantsRef, where('challengeId', '==', challengeId));
       const snapshot = await getDocs(q);

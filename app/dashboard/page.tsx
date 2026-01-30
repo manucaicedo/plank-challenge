@@ -45,6 +45,13 @@ export default function DashboardPage() {
 
   async function fetchUserData() {
     try {
+      // Check if db is initialized
+      if (!db || Object.keys(db).length === 0) {
+        console.error('Firestore not initialized');
+        setLoading(false);
+        return;
+      }
+
       // Fetch user's challenges
       const participantsRef = collection(db, 'participants');
       const participantsQuery = query(

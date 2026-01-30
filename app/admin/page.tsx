@@ -32,6 +32,13 @@ export default function AdminDashboard() {
 
   async function fetchChallenges() {
     try {
+      // Check if db is initialized
+      if (!db || Object.keys(db).length === 0) {
+        console.error('Firestore not initialized');
+        setLoading(false);
+        return;
+      }
+
       const challengesRef = collection(db, 'challenges');
       const q = query(challengesRef, orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
