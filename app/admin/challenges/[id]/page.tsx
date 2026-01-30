@@ -116,9 +116,26 @@ export default function ChallengeDetailPage() {
         createdAt: new Date().toISOString(),
       });
 
-      // TODO: Send email with invitation link
-      // For now, we'll just show success message
-      setInviteSuccess(`Invitation sent to ${inviteEmail}`);
+      // Send email invitation
+      const emailResponse = await fetch('/api/send-invitation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: inviteEmail,
+          challengeTitle: challenge?.title || 'Plank Challenge',
+          invitationToken,
+          challengeId,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        const errorData = await emailResponse.json();
+        throw new Error(errorData.error || 'Failed to send email');
+      }
+
+      setInviteSuccess(`Invitation email sent to ${inviteEmail}! 📧`);
       setInviteEmail('');
 
       // Refresh participants after short delay
@@ -232,7 +249,7 @@ export default function ChallengeDetailPage() {
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                   <p className="text-sm text-blue-900 font-medium mb-1">📧 Email Invitations</p>
                   <p className="text-xs text-blue-700">
-                    Note: Email service integration coming soon. For now, invitations are saved to the database.
+                    Invitations are sent via email with a link to accept and join the challenge.
                   </p>
                 </div>
               </div>
