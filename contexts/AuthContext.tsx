@@ -96,43 +96,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch user role from Firestore
   async function fetchUserRole(uid: string, email: string | null) {
+    console.log('AuthContext: fetchUserRole called for:', email);
+
     try {
       // Hardcoded admin emails (override database role)
       const ADMIN_EMAILS = ['manuela.i.caicedo@gmail.com'];
 
       if (email && ADMIN_EMAILS.includes(email.toLowerCase())) {
-        console.log('AuthContext: User is admin by email');
+        console.log('AuthContext: User is admin by email, setting role immediately');
         setUserRole('admin');
-
-        // Also create/update the database to reflect admin role (with timeout)
-        // This is non-blocking - if it fails, we still have admin access
-        setTimeout(async () => {
-          try {
-            console.log('AuthContext: Creating/updating admin user document in Firestore...');
-            await Promise.race([
-              setDoc(doc(db, 'users', uid), {
-                email: email,
-                name: email.split('@')[0],
-                role: 'admin',
-                createdAt: new Date().toISOString(),
-                avatar: null,
-              }, { merge: true }),
-              new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Firestore update timeout')), 5000)
-              )
-            ]);
-            console.log('AuthContext: Admin user document created/updated');
-          } catch (error) {
-            console.error('Error creating/updating admin user document:', error);
-          }
-        }, 0);
+        console.log('AuthContext: Admin role set, returning early');
         return;
       }
 
-      console.log('AuthContext: Fetching user role from Firestore...');
+      console.log('AuthContext: Not admin, fetching user role from Firestore...');
       const userDoc = await Promise.race([
         getDoc(doc(db, 'users', uid)),
-        new Promise((_, reject) =>
+        new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Firestore read timeout after 3 seconds')), 3000)
         )
       ]);
