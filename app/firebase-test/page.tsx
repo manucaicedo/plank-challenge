@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
-import { collection, getDocs, query, limit } from 'firebase/firestore';
+import { collection, getDocs, query, limit, doc, getDoc } from 'firebase/firestore';
 
 export default function FirebaseTestPage() {
   const [results, setResults] = useState<string[]>([]);
@@ -84,10 +84,32 @@ export default function FirebaseTestPage() {
     }
     log('');
 
+    // Test a document get (should be faster than a query)
+    log('5. Testing document get (5 second timeout):');
+    try {
+      const startTime = Date.now();
+      const testDoc = doc(db, 'challenges', 'test-doc-that-does-not-exist');
+
+      const result = await Promise.race([
+        getDoc(testDoc),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Document get timeout after 5 seconds')), 5000)
+        )
+      ]);
+
+      const duration = Date.now() - startTime;
+      log(`   ✓ Document get succeeded in ${duration}ms`);
+      log(`   Document exists: ${result.exists()}`);
+    } catch (error: any) {
+      log(`   ✗ Document get failed: ${error.message}`);
+    }
+    log('');
+
     // Test if we're running in a browser vs server
-    log('5. Environment check:');
+    log('6. Environment check:');
     log(`   Window defined: ${typeof window !== 'undefined' ? 'Yes' : 'No'}`);
     log(`   User agent: ${typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A'}`);
+    log(`   Online: ${typeof navigator !== 'undefined' ? navigator.onLine : 'N/A'}`);
     log('');
 
     log('=== Test Complete ===');
