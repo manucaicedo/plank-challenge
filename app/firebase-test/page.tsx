@@ -59,7 +59,7 @@ export default function FirebaseTestPage() {
     log('');
 
     // Test Firestore query
-    log('4. Testing Firestore query (5 second timeout):');
+    log('4. Testing Firestore query (10 second timeout):');
     try {
       const startTime = Date.now();
       const testQuery = query(collection(db, 'challenges'), limit(1));
@@ -67,7 +67,7 @@ export default function FirebaseTestPage() {
       const result = await Promise.race([
         getDocs(testQuery),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Query timeout after 5 seconds')), 5000)
+          setTimeout(() => reject(new Error('Query timeout after 10 seconds')), 10000)
         )
       ]);
 
@@ -76,7 +76,18 @@ export default function FirebaseTestPage() {
       log(`   Found ${result.docs.length} documents`);
     } catch (error: any) {
       log(`   ✗ Query failed: ${error.message}`);
+      log(`   Error code: ${error.code || 'none'}`);
+      log(`   Error name: ${error.name || 'none'}`);
+      if (error.stack) {
+        log(`   Stack (first 200 chars): ${error.stack.substring(0, 200)}`);
+      }
     }
+    log('');
+
+    // Test if we're running in a browser vs server
+    log('5. Environment check:');
+    log(`   Window defined: ${typeof window !== 'undefined' ? 'Yes' : 'No'}`);
+    log(`   User agent: ${typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A'}`);
     log('');
 
     log('=== Test Complete ===');
