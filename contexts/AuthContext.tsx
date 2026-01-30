@@ -36,6 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Sign up new user
   async function signup(email: string, password: string, name: string) {
+    let userCreated = false;
+    let userCredential;
+
     try {
       console.log('AuthContext: Starting signup for:', email);
 
@@ -45,9 +48,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Authentication service not available');
       }
 
+      // Check if Firestore is initialized
+      if (!db || Object.keys(db).length === 0) {
+        console.error('AuthContext: Firestore not properly initialized');
+        throw new Error('Database service not available');
+      }
+
       console.log('AuthContext: Creating user with Firebase Auth...');
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      userCreated = true;
       console.log('AuthContext: User created in Firebase Auth:', user.uid);
 
       // Update display name
@@ -73,6 +83,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('AuthContext: Signup complete!');
     } catch (error) {
       console.error('AuthContext: Signup error:', error);
+
+      // If we created the Auth user but failed to create Firestore doc, clean up
+      if (userCreated && userCredential) {
+        console.log('AuthContext: Cleaning up orphaned Auth account...');
+        try {
+          await userCredential.user.delete();
+          console.log('AuthContext: Orphaned Auth account deleted');
+        } catch (deleteError) {
+          console.error('AuthContext: Failed to delete orphaned account:', deleteError);
+        }
+      }
+
       throw error;
     }
   }

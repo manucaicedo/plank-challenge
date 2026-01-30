@@ -8,7 +8,7 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
-const userId = process.argv[2] || 'uHvs7RWnY7WamUVDCoC3v3ENNCl1';
+const userId = process.argv[2] || 'v9D1GGdYo3Tquu0Z7M6C8WrqjZX2';
 
 let serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT || path.join(__dirname, '..', 'serviceAccountKey.json');
 
