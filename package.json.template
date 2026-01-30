@@ -1,0 +1,24 @@
+{
+  "name": "plank-challenge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A web app for tracking plank exercises and challenges",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npm run start",
+    "start": "# Add your dev server command",
+    "build": "# Add your build command",
+    "test": "# Add your test command",
+    "lint": "# Add your lint command"
+  },
+  "dependencies": {
+    "# Add your dependencies here": ""
+  },
+  "devDependencies": {
+    "# Add your dev dependencies here": ""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
