@@ -51,7 +51,8 @@ export default function CreateChallengePage() {
       setError('');
       setLoading(true);
 
-      await addDoc(collection(db, 'challenges'), {
+      // Create the challenge
+      const challengeRef = await addDoc(collection(db, 'challenges'), {
         title,
         description,
         startDate,
@@ -62,6 +63,17 @@ export default function CreateChallengePage() {
         createdAt: new Date().toISOString(),
       });
 
+      // Automatically add the admin as a participant
+      await addDoc(collection(db, 'participants'), {
+        userId: user?.uid,
+        userEmail: user?.email || '',
+        userName: user?.displayName || 'Admin',
+        challengeId: challengeRef.id,
+        status: 'active',
+        joinedAt: new Date().toISOString(),
+      });
+
+      console.log('Challenge created and admin added as participant');
       router.push('/admin');
     } catch (err: any) {
       console.error('Error creating challenge:', err);
