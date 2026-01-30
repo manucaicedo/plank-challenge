@@ -156,13 +156,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       console.log('AuthContext: Setting up auth state listener');
-      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
         console.log('AuthContext: Auth state changed, user:', user ? user.email : 'null');
         clearTimeout(timeout);
         setUser(user);
         if (user) {
           console.log('AuthContext: Fetching role for user:', user.uid);
-          await fetchUserRole(user.uid, user.email);
+          // Don't await - fetch role in background to avoid blocking
+          fetchUserRole(user.uid, user.email).catch((error) => {
+            console.error('AuthContext: Error in fetchUserRole:', error);
+          });
         } else {
           setUserRole(null);
         }
