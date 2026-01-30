@@ -36,37 +36,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Sign up new user
   async function signup(email: string, password: string, name: string) {
-    let userCreated = false;
-    let userCredential;
+    console.log('AuthContext: Starting signup for:', email);
 
+    // Check if Firebase is initialized
+    if (!auth || typeof auth.createUser === 'undefined') {
+      console.error('AuthContext: Firebase auth not properly initialized');
+      throw new Error('Authentication service not available');
+    }
+
+    console.log('AuthContext: Creating user with Firebase Auth...');
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log('AuthContext: User created in Firebase Auth:', user.uid);
+
+    // Update display name
+    console.log('AuthContext: Updating display name...');
+    await updateProfile(user, { displayName: name });
+    console.log('AuthContext: Display name updated');
+
+    // Create user document in Firestore with timeout
+    // If this fails, we'll create it later when they log in
+    console.log('AuthContext: Creating Firestore user document...');
     try {
-      console.log('AuthContext: Starting signup for:', email);
-
-      // Check if Firebase is initialized
-      if (!auth || typeof auth.createUser === 'undefined') {
-        console.error('AuthContext: Firebase auth not properly initialized');
-        throw new Error('Authentication service not available');
-      }
-
-      // Check if Firestore is initialized
-      if (!db || Object.keys(db).length === 0) {
-        console.error('AuthContext: Firestore not properly initialized');
-        throw new Error('Database service not available');
-      }
-
-      console.log('AuthContext: Creating user with Firebase Auth...');
-      userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      userCreated = true;
-      console.log('AuthContext: User created in Firebase Auth:', user.uid);
-
-      // Update display name
-      console.log('AuthContext: Updating display name...');
-      await updateProfile(user, { displayName: name });
-      console.log('AuthContext: Display name updated');
-
-      // Create user document in Firestore with timeout
-      console.log('AuthContext: Creating Firestore user document...');
       await Promise.race([
         setDoc(doc(db, 'users', user.uid), {
           email: user.email,
@@ -80,23 +71,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         )
       ]);
       console.log('AuthContext: Firestore user document created');
-      console.log('AuthContext: Signup complete!');
-    } catch (error) {
-      console.error('AuthContext: Signup error:', error);
-
-      // If we created the Auth user but failed to create Firestore doc, clean up
-      if (userCreated && userCredential) {
-        console.log('AuthContext: Cleaning up orphaned Auth account...');
-        try {
-          await userCredential.user.delete();
-          console.log('AuthContext: Orphaned Auth account deleted');
-        } catch (deleteError) {
-          console.error('AuthContext: Failed to delete orphaned account:', deleteError);
-        }
-      }
-
-      throw error;
+    } catch (firestoreError) {
+      console.warn('AuthContext: Failed to create Firestore document during signup:', firestoreError);
+      console.log('AuthContext: Will create document on next login');
+      // Don't fail the signup - we can create the document later
     }
+    console.log('AuthContext: Signup complete!');
   }
 
   // Login existing user
@@ -121,26 +101,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const ADMIN_EMAILS = ['manuela.i.caicedo@gmail.com'];
 
       if (email && ADMIN_EMAILS.includes(email.toLowerCase())) {
+        console.log('AuthContext: User is admin by email');
         setUserRole('admin');
 
-        // Also update the database to reflect admin role
-        try {
-          await setDoc(doc(db, 'users', uid), { role: 'admin' }, { merge: true });
-        } catch (error) {
-          console.error('Error updating admin role in database:', error);
-        }
+        // Also create/update the database to reflect admin role (with timeout)
+        // This is non-blocking - if it fails, we still have admin access
+        setTimeout(async () => {
+          try {
+            console.log('AuthContext: Creating/updating admin user document in Firestore...');
+            await Promise.race([
+              setDoc(doc(db, 'users', uid), {
+                email: email,
+                name: email.split('@')[0],
+                role: 'admin',
+                createdAt: new Date().toISOString(),
+                avatar: null,
+              }, { merge: true }),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Firestore update timeout')), 5000)
+              )
+            ]);
+            console.log('AuthContext: Admin user document created/updated');
+          } catch (error) {
+            console.error('Error creating/updating admin user document:', error);
+          }
+        }, 0);
         return;
       }
 
-      const userDoc = await getDoc(doc(db, 'users', uid));
+      console.log('AuthContext: Fetching user role from Firestore...');
+      const userDoc = await Promise.race([
+        getDoc(doc(db, 'users', uid)),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firestore read timeout after 3 seconds')), 3000)
+        )
+      ]);
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        console.log('AuthContext: User role from Firestore:', userData.role);
         setUserRole(userData.role || 'participant');
       } else {
+        console.log('AuthContext: User document not found in Firestore, setting default role');
         setUserRole('participant');
       }
     } catch (error) {
       console.error('Error fetching user role:', error);
+      console.log('AuthContext: Setting default participant role due to error');
       setUserRole('participant');
     }
   }
