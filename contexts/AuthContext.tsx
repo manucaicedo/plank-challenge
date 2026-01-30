@@ -100,26 +100,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Listen for auth state changes
   useEffect(() => {
-    // Set a timeout to stop loading after 3 seconds even if auth doesn't respond
+    // Only run on client side
+    if (typeof window === 'undefined') {
+      setLoading(false);
+      return;
+    }
+
+    // Set a timeout to stop loading after 2 seconds even if auth doesn't respond
     const timeout = setTimeout(() => {
+      console.log('Auth timeout - stopping loading state');
       setLoading(false);
-    }, 3000);
+    }, 2000);
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    // Check if auth is properly initialized
+    if (!auth || typeof auth.onAuthStateChanged !== 'function') {
+      console.warn('Firebase auth not initialized');
       clearTimeout(timeout);
-      setUser(user);
-      if (user) {
-        await fetchUserRole(user.uid, user.email);
-      } else {
-        setUserRole(null);
-      }
       setLoading(false);
-    });
+      return;
+    }
 
-    return () => {
+    try {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        clearTimeout(timeout);
+        setUser(user);
+        if (user) {
+          await fetchUserRole(user.uid, user.email);
+        } else {
+          setUserRole(null);
+        }
+        setLoading(false);
+      });
+
+      return () => {
+        clearTimeout(timeout);
+        unsubscribe();
+      };
+    } catch (error) {
+      console.error('Error setting up auth listener:', error);
       clearTimeout(timeout);
-      unsubscribe();
-    };
+      setLoading(false);
+    }
   }, []);
 
   const value: AuthContextType = {
