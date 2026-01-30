@@ -66,7 +66,7 @@ export default function FirebaseTestPage() {
 
       const result = await Promise.race([
         getDocs(testQuery),
-        new Promise((_, reject) =>
+        new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Query timeout after 5 seconds')), 5000)
         )
       ]);
