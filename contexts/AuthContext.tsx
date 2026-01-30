@@ -68,8 +68,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Fetch user role from Firestore
-  async function fetchUserRole(uid: string) {
+  async function fetchUserRole(uid: string, email: string | null) {
     try {
+      // Hardcoded admin emails (override database role)
+      const ADMIN_EMAILS = ['manuela.i.caicedo@gmail.com'];
+
+      if (email && ADMIN_EMAILS.includes(email.toLowerCase())) {
+        setUserRole('admin');
+
+        // Also update the database to reflect admin role
+        try {
+          await setDoc(doc(db, 'users', uid), { role: 'admin' }, { merge: true });
+        } catch (error) {
+          console.error('Error updating admin role in database:', error);
+        }
+        return;
+      }
+
       const userDoc = await getDoc(doc(db, 'users', uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
@@ -94,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeout);
       setUser(user);
       if (user) {
-        await fetchUserRole(user.uid);
+        await fetchUserRole(user.uid, user.email);
       } else {
         setUserRole(null);
       }
