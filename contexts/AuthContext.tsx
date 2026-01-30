@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log('AuthContext: Starting signup for:', email);
 
     // Check if Firebase is initialized
-    if (!auth || typeof auth.createUser === 'undefined') {
+    if (!auth || Object.keys(auth).length === 0) {
       console.error('AuthContext: Firebase auth not properly initialized');
       throw new Error('Authentication service not available');
     }
