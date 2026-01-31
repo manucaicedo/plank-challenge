@@ -1,6 +1,6 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -30,7 +30,17 @@ if (typeof window !== 'undefined') {
     console.log('Firebase: Creating new app instance');
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
+
+    // Initialize Firestore with settings to handle connectivity issues
     db = getFirestore(app);
+
+    // Try to enable network (in case it was disabled)
+    import('firebase/firestore').then(({ enableNetwork }) => {
+      enableNetwork(db).catch((error) => {
+        console.warn('Firebase: Could not enable network:', error);
+      });
+    });
+
     console.log('Firebase: Initialized successfully');
   } else {
     console.log('Firebase: Using existing app instance');
