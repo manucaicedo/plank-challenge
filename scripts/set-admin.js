@@ -7,6 +7,7 @@
 
 const admin = require('firebase-admin');
 const readline = require('readline');
+const path = require('path');
 
 // Check if email argument is provided
 const userEmail = process.argv[2];
@@ -18,7 +19,7 @@ if (!userEmail) {
 }
 
 // Initialize Firebase Admin (requires service account key)
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT || './serviceAccountKey.json';
+const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT || path.join(__dirname, '..', 'serviceAccountKey.json');
 
 try {
   const serviceAccount = require(serviceAccountPath);

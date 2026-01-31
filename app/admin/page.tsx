@@ -6,7 +6,7 @@ import AdminRoute from '@/components/AdminRoute';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { getLocalDateString } from '@/lib/utils/dateUtils';
 
 interface Challenge {
@@ -54,6 +54,46 @@ export default function AdminDashboard() {
       console.error('Error fetching challenges:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDeleteChallenge(challengeId: string, challengeTitle: string) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${challengeTitle}"?\n\nThis will also delete:\n- All participant records\n- All plank records\n- All associated data\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      // Delete the challenge document
+      await deleteDoc(doc(db, 'challenges', challengeId));
+
+      // Delete related participants
+      const participantsRef = collection(db, 'participants');
+      const participantsQuery = query(participantsRef, where('challengeId', '==', challengeId));
+      const participantsSnapshot = await getDocs(participantsQuery);
+
+      const deletePromises = participantsSnapshot.docs.map((doc) => deleteDoc(doc.ref));
+
+      // Delete related planks
+      const planksRef = collection(db, 'planks');
+      const planksQuery = query(planksRef, where('challengeId', '==', challengeId));
+      const planksSnapshot = await getDocs(planksQuery);
+
+      deletePromises.push(...planksSnapshot.docs.map((doc) => deleteDoc(doc.ref)));
+
+      // Wait for all deletions to complete
+      await Promise.all(deletePromises);
+
+      // Update local state
+      setChallenges(challenges.filter((c) => c.id !== challengeId));
+
+      alert('Challenge deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting challenge:', error);
+      alert('Failed to delete challenge. Please try again.');
     }
   }
 
@@ -135,12 +175,20 @@ export default function AdminDashboard() {
                               <span>📅 {challenge.startDate} to {challenge.endDate}</span>
                             </div>
                           </div>
-                          <Link
-                            href={`/admin/challenges/${challenge.id}`}
-                            className="ml-4 text-blue-600 hover:text-blue-700 font-medium text-sm"
-                          >
-                            View Details →
-                          </Link>
+                          <div className="ml-4 flex flex-col space-y-2">
+                            <Link
+                              href={`/admin/challenges/${challenge.id}`}
+                              className="text-blue-600 hover:text-blue-700 font-medium text-sm whitespace-nowrap"
+                            >
+                              View Details →
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteChallenge(challenge.id, challenge.title)}
+                              className="text-red-600 hover:text-red-700 font-medium text-sm whitespace-nowrap text-left"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );

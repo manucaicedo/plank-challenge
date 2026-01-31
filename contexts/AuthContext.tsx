@@ -94,8 +94,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await sendPasswordResetEmail(auth, email);
   }
 
-  // Fetch user role from Firestore
-  async function fetchUserRole(uid: string, email: string | null) {
+  // Fetch user role from Firestore (and create document if missing)
+  async function fetchUserRole(uid: string, email: string | null, displayName: string | null) {
     console.log('AuthContext: fetchUserRole called for:', email);
 
     try {
@@ -110,8 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       console.log('AuthContext: Not admin, fetching user role from Firestore...');
+      const userDocRef = doc(db, 'users', uid);
       const userDoc = await Promise.race([
-        getDoc(doc(db, 'users', uid)),
+        getDoc(userDocRef),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Firestore read timeout after 3 seconds')), 3000)
         )
@@ -122,8 +123,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('AuthContext: User role from Firestore:', userData.role);
         setUserRole(userData.role || 'participant');
       } else {
-        console.log('AuthContext: User document not found in Firestore, setting default role');
-        setUserRole('participant');
+        console.log('AuthContext: User document not found in Firestore, creating it now...');
+
+        // Create missing user document
+        try {
+          await setDoc(userDocRef, {
+            email: email,
+            name: displayName || email?.split('@')[0] || 'User',
+            role: 'participant',
+            createdAt: new Date().toISOString(),
+            avatar: null,
+          });
+          console.log('AuthContext: User document created successfully');
+          setUserRole('participant');
+        } catch (createError) {
+          console.error('AuthContext: Failed to create user document:', createError);
+          console.log('AuthContext: Setting default participant role');
+          setUserRole('participant');
+        }
       }
     } catch (error) {
       console.error('Error fetching user role:', error);
@@ -163,7 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (user) {
           console.log('AuthContext: Fetching role for user:', user.uid);
           // Don't await - fetch role in background to avoid blocking
-          fetchUserRole(user.uid, user.email).catch((error) => {
+          fetchUserRole(user.uid, user.email, user.displayName).catch((error) => {
             console.error('AuthContext: Error in fetchUserRole:', error);
           });
         } else {
