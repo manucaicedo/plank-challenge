@@ -156,12 +156,12 @@ export default function BrowseChallengesPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-6 md:py-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Browse Challenges</h1>
-            <p className="text-gray-600">Discover and join plank challenges</p>
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">Browse Challenges</h1>
+            <p className="text-sm md:text-base text-gray-600">Discover and join plank challenges</p>
           </div>
 
           {/* Success/Error Messages */}
@@ -178,20 +178,20 @@ export default function BrowseChallengesPage() {
           )}
 
           {/* Filters */}
-          <div className="mb-6 flex space-x-4">
+          <div className="mb-6 flex flex-wrap gap-2 md:gap-4">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
+              className={`px-3 md:px-4 py-2 rounded-lg text-sm md:text-base font-medium transition ${
                 filter === 'all'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              All Challenges
+              All
             </button>
             <button
               onClick={() => setFilter('active')}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
+              className={`px-3 md:px-4 py-2 rounded-lg text-sm md:text-base font-medium transition ${
                 filter === 'active'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -201,7 +201,7 @@ export default function BrowseChallengesPage() {
             </button>
             <button
               onClick={() => setFilter('upcoming')}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
+              className={`px-3 md:px-4 py-2 rounded-lg text-sm md:text-base font-medium transition ${
                 filter === 'upcoming'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -223,7 +223,7 @@ export default function BrowseChallengesPage() {
               </p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
               {filteredChallenges.map((challenge) => {
                 const joined = isUserJoined(challenge.id);
                 const isJoining = joiningId === challenge.id;
@@ -231,12 +231,12 @@ export default function BrowseChallengesPage() {
                 return (
                   <div
                     key={challenge.id}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                    className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition"
                   >
                     {/* Status Badge */}
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-3 md:mb-4 gap-2">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        className={`px-2 md:px-3 py-1 rounded-full text-xs font-medium ${
                           challenge.status === 'active'
                             ? 'bg-green-100 text-green-700'
                             : challenge.status === 'upcoming'
@@ -247,17 +247,17 @@ export default function BrowseChallengesPage() {
                         {challenge.status.charAt(0).toUpperCase() + challenge.status.slice(1)}
                       </span>
                       {joined && (
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                        <span className="px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
                           Joined
                         </span>
                       )}
                     </div>
 
                     {/* Challenge Info */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{challenge.title}</h3>
-                    <p className="text-gray-600 mb-4">{challenge.description}</p>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{challenge.title}</h3>
+                    <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4">{challenge.description}</p>
 
-                    <div className="space-y-2 text-sm text-gray-500 mb-4">
+                    <div className="space-y-1 md:space-y-2 text-xs md:text-sm text-gray-500 mb-3 md:mb-4">
                       <p>📅 {challenge.startDate} to {challenge.endDate}</p>
                     </div>
 
@@ -265,7 +265,7 @@ export default function BrowseChallengesPage() {
                     <button
                       onClick={() => handleJoinChallenge(challenge.id)}
                       disabled={joined || isJoining}
-                      className={`w-full font-semibold py-3 rounded-lg transition ${
+                      className={`w-full text-sm md:text-base font-semibold py-2.5 md:py-3 rounded-lg transition ${
                         joined
                           ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                           : 'bg-blue-600 hover:bg-blue-700 text-white'

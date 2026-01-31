@@ -188,14 +188,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-6 md:py-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
               Welcome back, {user.displayName || 'Participant'}! 💪
             </h1>
-            <p className="text-gray-600">Track your progress and keep up the streak!</p>
+            <p className="text-sm md:text-base text-gray-600">Track your progress and keep up the streak!</p>
           </div>
 
           {challenges.length === 0 ? (
@@ -232,10 +232,10 @@ export default function DashboardPage() {
               )}
 
               {/* Record Plank Button */}
-              <div className="mb-8">
+              <div className="mb-6 md:mb-8">
                 <Link
                   href="/record-plank"
-                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-xl transition shadow-lg hover:shadow-xl"
+                  className="block sm:inline-block text-center bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-lg md:text-xl transition shadow-lg hover:shadow-xl"
                 >
                   ⏱️ Record Today's Plank
                 </Link>
@@ -244,53 +244,53 @@ export default function DashboardPage() {
               {stats && (
                 <>
                   {/* Stats Cards */}
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white rounded-lg shadow-md p-6">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-600 text-sm font-medium">Days Completed</span>
-                        <span className="text-2xl">✅</span>
+                        <span className="text-gray-600 text-xs md:text-sm font-medium">Days</span>
+                        <span className="text-xl md:text-2xl">✅</span>
                       </div>
-                      <div className="text-3xl font-bold text-gray-900">
+                      <div className="text-2xl md:text-3xl font-bold text-gray-900">
                         {stats.daysCompleted}/{stats.totalDays}
                       </div>
-                      <div className="mt-2 text-sm text-gray-500">
-                        {stats.completionRate}% complete
+                      <div className="mt-1 md:mt-2 text-xs md:text-sm text-gray-500">
+                        {stats.completionRate}% done
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-6">
+                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-600 text-sm font-medium">Current Streak</span>
-                        <span className="text-2xl">🔥</span>
+                        <span className="text-gray-600 text-xs md:text-sm font-medium">Streak</span>
+                        <span className="text-xl md:text-2xl">🔥</span>
                       </div>
-                      <div className="text-3xl font-bold text-gray-900">{stats.currentStreak}</div>
-                      <div className="mt-2 text-sm text-gray-500">
-                        Longest: {stats.longestStreak} days
+                      <div className="text-2xl md:text-3xl font-bold text-gray-900">{stats.currentStreak}</div>
+                      <div className="mt-1 md:mt-2 text-xs md:text-sm text-gray-500">
+                        Best: {stats.longestStreak}
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-6">
+                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-600 text-sm font-medium">Total Time</span>
-                        <span className="text-2xl">⏱️</span>
+                        <span className="text-gray-600 text-xs md:text-sm font-medium">Total</span>
+                        <span className="text-xl md:text-2xl">⏱️</span>
                       </div>
-                      <div className="text-3xl font-bold text-gray-900">
+                      <div className="text-2xl md:text-3xl font-bold text-gray-900">
                         {formatDuration(stats.totalTime)}
                       </div>
-                      <div className="mt-2 text-sm text-gray-500">
+                      <div className="mt-1 md:mt-2 text-xs md:text-sm text-gray-500">
                         Avg: {formatDuration(stats.averageTime)}
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-6">
+                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-600 text-sm font-medium">Longest Plank</span>
-                        <span className="text-2xl">🏆</span>
+                        <span className="text-gray-600 text-xs md:text-sm font-medium">Record</span>
+                        <span className="text-xl md:text-2xl">🏆</span>
                       </div>
-                      <div className="text-3xl font-bold text-gray-900">
+                      <div className="text-2xl md:text-3xl font-bold text-gray-900">
                         {formatDuration(stats.longestPlank)}
                       </div>
-                      <div className="mt-2 text-sm text-gray-500">Personal record</div>
+                      <div className="mt-1 md:mt-2 text-xs md:text-sm text-gray-500">Best plank</div>
                     </div>
                   </div>
 

@@ -272,19 +272,19 @@ export default function RecordPlankPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-6 md:py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 text-center mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 text-center mb-6 md:mb-8">
             Record Your Daily Plank
           </h1>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
+            <div className="mb-6 p-3 md:p-4 bg-red-50 border border-red-200 text-red-700 text-sm md:text-base rounded-lg text-center">
               {error}
             </div>
           )}
 
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
             {!showTimer ? (
               <div className="text-center">
                 {challenges.length > 1 && (

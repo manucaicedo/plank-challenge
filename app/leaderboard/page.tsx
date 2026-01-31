@@ -282,12 +282,12 @@ export default function LeaderboardPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-6 md:py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">🏆 Leaderboard</h1>
-            <p className="text-gray-600">See how you rank against other participants</p>
+          <div className="mb-6 md:mb-8 text-center">
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">🏆 Leaderboard</h1>
+            <p className="text-sm md:text-base text-gray-600">See how you rank against other participants</p>
           </div>
 
           {challenges.length === 0 ? (
@@ -318,67 +318,67 @@ export default function LeaderboardPage() {
               )}
 
               {/* Sort Options */}
-              <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+              <div className="bg-white rounded-lg shadow-md p-3 md:p-4 mb-6">
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => handleSortChange('totalTime')}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm md:text-base font-medium transition ${
                       sortBy === 'totalTime'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    Total Time
+                    Total
                   </button>
                   <button
                     onClick={() => handleSortChange('longestPlank')}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm md:text-base font-medium transition ${
                       sortBy === 'longestPlank'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    Longest Plank
+                    Longest
                   </button>
                   <button
                     onClick={() => handleSortChange('daysCompleted')}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm md:text-base font-medium transition ${
                       sortBy === 'daysCompleted'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    Days Completed
+                    Days
                   </button>
                   <button
                     onClick={() => handleSortChange('currentStreak')}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm md:text-base font-medium transition ${
                       sortBy === 'currentStreak'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    Current Streak
+                    Streak
                   </button>
                   <button
                     onClick={() => handleSortChange('averageTime')}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm md:text-base font-medium transition ${
                       sortBy === 'averageTime'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    Average Time
+                    Average
                   </button>
                   <button
                     onClick={() => handleSortChange('improvementRate')}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm md:text-base font-medium transition ${
                       sortBy === 'improvementRate'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    📈 Most Improved
+                    📈 Improved
                   </button>
                 </div>
               </div>
@@ -405,7 +405,7 @@ export default function LeaderboardPage() {
                       return (
                         <div
                           key={entry.userId}
-                          className={`p-6 transition ${
+                          className={`p-4 md:p-6 transition ${
                             isCurrentUser
                               ? 'bg-blue-50 border-l-4 border-blue-600'
                               : isPodium
@@ -413,40 +413,40 @@ export default function LeaderboardPage() {
                               : 'hover:bg-gray-50'
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center space-x-2 md:space-x-4 flex-1 min-w-0">
                               {/* Rank */}
-                              <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+                              <div className="flex-shrink-0 w-8 md:w-12 h-8 md:h-12 flex items-center justify-center">
                                 {isPodium ? (
-                                  <span className="text-3xl">
+                                  <span className="text-2xl md:text-3xl">
                                     {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                                   </span>
                                 ) : (
-                                  <span className="text-xl font-bold text-gray-400">
+                                  <span className="text-base md:text-xl font-bold text-gray-400">
                                     #{entry.rank}
                                   </span>
                                 )}
                               </div>
 
                               {/* User Info */}
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-2">
-                                  <p className="font-semibold text-gray-900 text-lg">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center flex-wrap gap-1.5 md:gap-2">
+                                  <p className="font-semibold text-gray-900 text-sm md:text-lg truncate">
                                     {entry.userName}
                                   </p>
                                   {isCurrentUser && (
-                                    <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded">
+                                    <span className="px-1.5 md:px-2 py-0.5 md:py-1 bg-blue-600 text-white text-xs rounded">
                                       You
                                     </span>
                                   )}
                                   {entry.fistbumpCount > 0 && (
-                                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded flex items-center space-x-1">
+                                    <span className="px-1.5 md:px-2 py-0.5 md:py-1 bg-orange-100 text-orange-700 text-xs rounded flex items-center space-x-1">
                                       <span>👊</span>
                                       <span>{entry.fistbumpCount}</span>
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-sm text-gray-500">{entry.userEmail}</p>
+                                <p className="text-xs md:text-sm text-gray-500 truncate">{entry.userEmail}</p>
                               </div>
 
                               {/* Stats */}
@@ -484,22 +484,32 @@ export default function LeaderboardPage() {
                                 <button
                                   onClick={() => giveFistbump(entry.userId, entry.userName)}
                                   disabled={givingFistbump === entry.userId}
-                                  className="flex-shrink-0 px-3 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded-lg text-sm font-medium transition"
+                                  className="hidden sm:block flex-shrink-0 px-2 md:px-3 py-1.5 md:py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded-lg text-xs md:text-sm font-medium transition"
                                 >
-                                  {givingFistbump === entry.userId ? '...' : '👊 Fistbump'}
+                                  {givingFistbump === entry.userId ? '...' : '👊'}
                                 </button>
                               )}
                             </div>
 
                             {/* Current Sort Value (mobile) */}
-                            <div className="md:hidden text-right">
-                              <p className="text-2xl font-bold text-blue-600">
+                            <div className="text-right flex-shrink-0">
+                              <p className="text-lg md:text-2xl font-bold text-blue-600">
                                 {sortBy === 'totalTime' || sortBy === 'longestPlank' || sortBy === 'averageTime'
                                   ? formatDuration(entry[sortBy])
                                   : sortBy === 'improvementRate'
                                   ? `${entry.improvementRate > 0 ? '+' : ''}${entry[sortBy]}%`
                                   : entry[sortBy]}
                               </p>
+                              {/* Mobile Fistbump Button */}
+                              {!isCurrentUser && (
+                                <button
+                                  onClick={() => giveFistbump(entry.userId, entry.userName)}
+                                  disabled={givingFistbump === entry.userId}
+                                  className="sm:hidden mt-1 px-2 py-1 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded text-xs font-medium transition w-full"
+                                >
+                                  {givingFistbump === entry.userId ? '...' : '👊'}
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>

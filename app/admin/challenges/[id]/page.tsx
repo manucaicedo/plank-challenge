@@ -126,35 +126,35 @@ export default function ChallengeDetailPage() {
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
         <Navbar />
 
-        <main className="container mx-auto px-4 py-12">
+        <main className="container mx-auto px-4 py-6 md:py-12">
           <div className="max-w-6xl mx-auto">
             {/* Header */}
-            <div className="mb-8">
+            <div className="mb-6 md:mb-8">
               <button
                 onClick={() => router.push('/admin')}
-                className="text-blue-600 hover:text-blue-700 mb-4"
+                className="text-sm md:text-base text-blue-600 hover:text-blue-700 mb-4"
               >
                 ← Back to Dashboard
               </button>
-              <h1 className="text-3xl font-bold text-gray-900">{challenge.title}</h1>
-              <p className="text-gray-600 mt-2">{challenge.description}</p>
-              <div className="flex items-center space-x-4 mt-4 text-sm text-gray-500">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{challenge.title}</h1>
+              <p className="text-sm md:text-base text-gray-600 mt-2">{challenge.description}</p>
+              <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-4 text-xs md:text-sm text-gray-500">
                 <span>📅 {challenge.startDate} to {challenge.endDate}</span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span>👥 {participants.length} participants</span>
               </div>
             </div>
 
             {/* Info Box */}
-            <div className="mb-8 bg-blue-50 rounded-lg p-6">
-              <p className="text-blue-900">
+            <div className="mb-6 md:mb-8 bg-blue-50 rounded-lg p-4 md:p-6">
+              <p className="text-sm md:text-base text-blue-900">
                 Users can join this challenge from the <strong>Browse Challenges</strong> page. No invitations needed!
               </p>
             </div>
 
             {/* Participants List */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Participants ({participants.length})</h2>
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Participants ({participants.length})</h2>
 
               {participants.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
