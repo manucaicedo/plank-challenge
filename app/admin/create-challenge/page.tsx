@@ -112,7 +112,7 @@ export default function CreateChallengePage() {
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                     placeholder="January 2026 Plank Challenge"
                     disabled={loading}
                   />
@@ -127,7 +127,7 @@ export default function CreateChallengePage() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                     placeholder="Join us for a month of building core strength! Record your daily plank and compete with friends."
                     disabled={loading}
                   />
@@ -143,7 +143,7 @@ export default function CreateChallengePage() {
                       id="startDate"
                       value={startDate}
                       onChange={(e) => handleStartDateChange(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                       disabled={loading}
                     />
                   </div>
@@ -157,7 +157,7 @@ export default function CreateChallengePage() {
                       id="endDate"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                       disabled={loading}
                     />
                   </div>
@@ -172,7 +172,7 @@ export default function CreateChallengePage() {
                     value={rules}
                     onChange={(e) => setRules(e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                     placeholder="1. Record one plank per day&#10;2. Minimum 10 seconds&#10;3. No skipping days&#10;4. Proper form required"
                     disabled={loading}
                   />

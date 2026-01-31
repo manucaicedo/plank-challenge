@@ -31,6 +31,9 @@ export default function Navbar() {
                 <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
                   Dashboard
                 </Link>
+                <Link href="/challenges" className="text-gray-600 hover:text-gray-900">
+                  Browse Challenges
+                </Link>
                 <Link href="/leaderboard" className="text-gray-600 hover:text-gray-900">
                   Leaderboard
                 </Link>

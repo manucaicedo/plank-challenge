@@ -203,8 +203,14 @@ export default function DashboardPage() {
               <div className="text-6xl mb-4">📋</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">No Active Challenges</h2>
               <p className="text-gray-600 mb-6">
-                You're not currently participating in any challenges. Ask an admin to invite you!
+                You're not currently participating in any challenges.
               </p>
+              <Link
+                href="/challenges"
+                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+              >
+                Browse Available Challenges
+              </Link>
             </div>
           ) : (
             <>

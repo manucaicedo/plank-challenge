@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import AdminRoute from '@/components/AdminRoute';
 import Navbar from '@/components/Navbar';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 interface Challenge {
   id: string;
@@ -36,10 +36,6 @@ export default function ChallengeDetailPage() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteLoading, setInviteLoading] = useState(false);
-  const [inviteSuccess, setInviteSuccess] = useState('');
-  const [inviteError, setInviteError] = useState('');
 
   useEffect(() => {
     fetchChallenge();
@@ -92,61 +88,6 @@ export default function ChallengeDetailPage() {
     }
   }
 
-  async function handleInvite(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!inviteEmail) {
-      return setInviteError('Please enter an email address');
-    }
-
-    try {
-      setInviteError('');
-      setInviteSuccess('');
-      setInviteLoading(true);
-
-      // Create invitation token
-      const invitationToken = Math.random().toString(36).substring(2, 15);
-
-      // Save invitation to Firestore
-      await addDoc(collection(db, 'invitations'), {
-        challengeId,
-        email: inviteEmail,
-        token: invitationToken,
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-      });
-
-      // Send email invitation
-      const emailResponse = await fetch('/api/send-invitation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: inviteEmail,
-          challengeTitle: challenge?.title || 'Plank Challenge',
-          invitationToken,
-          challengeId,
-        }),
-      });
-
-      if (!emailResponse.ok) {
-        const errorData = await emailResponse.json();
-        throw new Error(errorData.error || 'Failed to send email');
-      }
-
-      setInviteSuccess(`Invitation email sent to ${inviteEmail}! 📧`);
-      setInviteEmail('');
-
-      // Refresh participants after short delay
-      setTimeout(fetchParticipants, 1000);
-    } catch (error: any) {
-      console.error('Error sending invitation:', error);
-      setInviteError(error.message || 'Failed to send invitation');
-    } finally {
-      setInviteLoading(false);
-    }
-  }
 
   if (loading) {
     return (
@@ -204,90 +145,46 @@ export default function ChallengeDetailPage() {
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Invite Participants */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Invite Participants</h2>
+            {/* Info Box */}
+            <div className="mb-8 bg-blue-50 rounded-lg p-6">
+              <p className="text-blue-900">
+                Users can join this challenge from the <strong>Browse Challenges</strong> page. No invitations needed!
+              </p>
+            </div>
 
-                {inviteSuccess && (
-                  <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
-                    {inviteSuccess}
-                  </div>
-                )}
+            {/* Participants List */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Participants ({participants.length})</h2>
 
-                {inviteError && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-                    {inviteError}
-                  </div>
-                )}
-
-                <form onSubmit={handleInvite} className="space-y-4">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="participant@example.com"
-                      disabled={inviteLoading}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={inviteLoading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {inviteLoading ? 'Sending...' : 'Send Invitation'}
-                  </button>
-                </form>
-
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-blue-900 font-medium mb-1">📧 Email Invitations</p>
-                  <p className="text-xs text-blue-700">
-                    Invitations are sent via email with a link to accept and join the challenge.
-                  </p>
+              {participants.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm">No participants yet</p>
+                  <p className="text-xs mt-1">Users can join from the Browse Challenges page!</p>
                 </div>
-              </div>
-
-              {/* Participants List */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Participants ({participants.length})</h2>
-
-                {participants.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="text-sm">No participants yet</p>
-                    <p className="text-xs mt-1">Start by inviting people to join!</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {participants.map((participant) => (
-                      <div
-                        key={participant.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                      >
-                        <div>
-                          <p className="font-medium text-gray-900">{participant.userName}</p>
-                          <p className="text-sm text-gray-600">{participant.userEmail}</p>
-                        </div>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            participant.status === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-yellow-100 text-yellow-700'
-                          }`}
-                        >
-                          {participant.status}
-                        </span>
+              ) : (
+                <div className="space-y-3">
+                  {participants.map((participant) => (
+                    <div
+                      key={participant.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium text-gray-900">{participant.userName}</p>
+                        <p className="text-sm text-gray-600">{participant.userEmail}</p>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          participant.status === 'active'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}
+                      >
+                        {participant.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Challenge Details */}
